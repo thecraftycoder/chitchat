@@ -1,4 +1,5 @@
 module.exports = function () {
+  const cool = require('cool-ascii-faces')
   const express = require('express')
   const mongoose = require('mongoose')
   const morgan = require('morgan')
@@ -14,6 +15,7 @@ module.exports = function () {
 
   app.use('/', AuthController)
   app.use('/', MessageController)
+  app.get('/cool', (req, res) => res.send(cool()))
 
   const http = require('http').createServer(app)
   const io = require('socket.io')(http)
