@@ -23,8 +23,7 @@ module.exports = function () {
   io.on('connection', SocketController(io))
 
   const connectDatabase = async (databaseName = 'chatroom', hostname = 'localhost') => {
-    const database = await mongoose.connect(
-      `mongodb://${hostname}/${databaseName}`,
+    const database = await mongoose.connect(process.env.MONGODB_URI || `mongodb://${hostname}/${databaseName}`,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -35,6 +34,10 @@ module.exports = function () {
     console.log(`Database connected at mongodb://${hostname}/${databaseName}...`)
 
     return database
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('client/build'))
   }
 
   const startServer = port => {
