@@ -1,21 +1,23 @@
 module.exports = function () {
-  const cool = require('cool-ascii-faces')
   const express = require('express')
   const mongoose = require('mongoose')
   const morgan = require('morgan')
+  const path = require('path')
   const AuthController = require('./controllers/auth')
   const MessageController = require('./controllers/messages')
   const SocketController = require('./controllers/socket-events')
 
   const app = express()
 
-  app.use(express.static('static'))
+  app.use(express.static(path.join(__dirname, 'client-react/build')))
   app.use(express.json())
   app.use(morgan('tiny'))
 
+  app.get('/*', function (req, res) {
+    res.sendFile(path.join(__dirname, 'client-react/build', 'index.html'))
+  })
   app.use('/', AuthController)
   app.use('/', MessageController)
-  app.get('/cool', (req, res) => res.send(cool()))
 
   const http = require('http').createServer(app)
   const io = require('socket.io')(http)
