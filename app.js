@@ -1,4 +1,5 @@
 module.exports = function () {
+  const cool = require('cool-ascii-faces')
   const express = require('express')
   const mongoose = require('mongoose')
   const morgan = require('morgan')
@@ -14,6 +15,7 @@ module.exports = function () {
 
   app.use('/', AuthController)
   app.use('/', MessageController)
+  app.get('/cool', (req, res) => res.send(cool()))
 
   const http = require('http').createServer(app)
   const io = require('socket.io')(http)
@@ -21,8 +23,7 @@ module.exports = function () {
   io.on('connection', SocketController(io))
 
   const connectDatabase = async (databaseName = 'chatroom', hostname = 'localhost') => {
-    const database = await mongoose.connect(
-      `mongodb://${hostname}/${databaseName}`,
+    const database = await mongoose.connect(process.env.MONGODB_URI || `mongodb://${hostname}/${databaseName}`,
       {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -33,6 +34,10 @@ module.exports = function () {
     console.log(`Database connected at mongodb://${hostname}/${databaseName}...`)
 
     return database
+  }
+
+  if (process.env.NODE_ENV === 'production') {
+    app.use(express.static('client/build'))
   }
 
   const startServer = port => {

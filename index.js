@@ -1,5 +1,5 @@
-const port = 8000
+const PORT = process.env.PORT || 5000
 
 const startServer = require('./app')()
 
-startServer(port)
+startServer(PORT)
